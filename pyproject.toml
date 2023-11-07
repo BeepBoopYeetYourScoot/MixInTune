@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "mixintune"
+version = "0.1.0"
+description = ""
+authors = ["kalitka <zavorotnii.dr@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+async-spotify = "^0.4.4"
+black = "^23.10.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
