@@ -16,12 +16,12 @@ auth_flow = AuthorizationCodeFlow(
     redirect_url=settings.SPOTIFY_REDIRECT_URL,
 )
 
-api_client = SpotifyApiClient(auth_flow, hold_authentication=True)
+spotify_client = SpotifyApiClient(auth_flow, hold_authentication=True)
 
 
 @spotify_router.get("login")
 async def login():
-    authorization_url: str = api_client.build_authorization_url(
+    authorization_url: str = spotify_client.build_authorization_url(
         show_dialog=True
     )
     loguru.logger.info(f"{authorization_url=}")
@@ -31,7 +31,12 @@ async def login():
 @spotify_router.get("callback")
 async def authorize(code: str):
     auth_token: SpotifyAuthorisationToken = (
-        await api_client.get_auth_token_with_code(code)
+        await spotify_client.get_auth_token_with_code(code)
     )
-    await api_client.create_new_client()
+    await spotify_client.create_new_client()
     return auth_token
+
+
+@spotify_router.get("playlists")
+async def list_playlists():
+    return await spotify_client.playlists.current_get_all()
