@@ -3,7 +3,7 @@ import dotenv
 dotenv.load_dotenv()
 
 
-SPOTIFY_CLIENT_ID = "56a7b64a311e40278ddcc00cc42e12b0"
-SPOTIFY_CLIENT_SECRET = "0004ba0c53344dd084e33b180ab533ff"
+SPOTIFY_CLIENT_ID = "3a1255e198e14137b9a5f30fc6ec30a5"
+SPOTIFY_CLIENT_SECRET = "e3036089552a4ea79ca5ccf8bac45f80"
 SPOTIFY_SCOPES: list[str] = []
-SPOTIFY_REDIRECT_URL = "http://localhost:8080"
+SPOTIFY_REDIRECT_URL = "http://localhost:8080/integrations/spotify/callback"
