@@ -4,10 +4,12 @@ from async_spotify.authentification import SpotifyAuthorisationToken
 from async_spotify.authentification.authorization_flows import (
     AuthorizationCodeFlow,
 )
-from starlette.responses import RedirectResponse
+from fastapi import APIRouter
 
 from core import settings
-from integrations.spotify.router import spotify_router
+
+spotify_router = APIRouter(prefix="/integrations/spotify")
+
 
 auth_flow = AuthorizationCodeFlow(
     application_id=settings.SPOTIFY_CLIENT_ID,
@@ -19,16 +21,16 @@ auth_flow = AuthorizationCodeFlow(
 spotify_client = SpotifyApiClient(auth_flow, hold_authentication=True)
 
 
-@spotify_router.get("login")
+@spotify_router.get("/login")
 async def login():
     authorization_url: str = spotify_client.build_authorization_url(
         show_dialog=True
     )
     loguru.logger.info(f"{authorization_url=}")
-    return RedirectResponse(authorization_url, status_code=303)
+    return authorization_url
 
 
-@spotify_router.get("callback")
+@spotify_router.get("/callback")
 async def authorize(code: str):
     auth_token: SpotifyAuthorisationToken = (
         await spotify_client.get_auth_token_with_code(code)
@@ -37,6 +39,6 @@ async def authorize(code: str):
     return auth_token
 
 
-@spotify_router.get("playlists")
+@spotify_router.get("/playlists")
 async def list_playlists():
     return await spotify_client.playlists.current_get_all()
