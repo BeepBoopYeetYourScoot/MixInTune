@@ -6,16 +6,18 @@ from async_spotify.authentification.authorization_flows import (
 )
 from fastapi import APIRouter
 
-from core import settings
+from core.settings import get_settings
+
+settings = get_settings()
 
 spotify_router = APIRouter(prefix="/integrations/spotify")
 
 
 auth_flow = AuthorizationCodeFlow(
-    application_id=settings.SPOTIFY_CLIENT_ID,
-    application_secret=settings.SPOTIFY_CLIENT_SECRET,
-    scopes=settings.SPOTIFY_SCOPES,
-    redirect_url=settings.SPOTIFY_REDIRECT_URL,
+    application_id=settings.spotify_settings.client_id,
+    application_secret=settings.spotify_settings.client_secret,
+    scopes=settings.spotify_settings.scopes,
+    redirect_url=settings.spotify_settings.redirect_url,
 )
 
 spotify_client = SpotifyApiClient(auth_flow, hold_authentication=True)
@@ -32,6 +34,7 @@ async def login():
 
 @spotify_router.get("/callback")
 async def authorize(code: str):
+    # TODO Need to cache it with Redis
     auth_token: SpotifyAuthorisationToken = (
         await spotify_client.get_auth_token_with_code(code)
     )
