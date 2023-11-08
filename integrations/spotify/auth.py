@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import loguru
 from async_spotify import SpotifyApiClient
 from async_spotify.authentification import SpotifyAuthorisationToken
@@ -20,7 +22,13 @@ auth_flow = AuthorizationCodeFlow(
     redirect_url=settings.spotify_settings.redirect_url,
 )
 
-spotify_client = SpotifyApiClient(auth_flow, hold_authentication=True)
+
+@lru_cache
+def get_spotify_client():
+    return SpotifyApiClient(auth_flow, hold_authentication=True)
+
+
+spotify_client = get_spotify_client()
 
 
 @spotify_router.get("/login")
