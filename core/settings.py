@@ -1,9 +1,25 @@
+from functools import lru_cache
+
 import dotenv
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
 dotenv.load_dotenv()
 
 
-SPOTIFY_CLIENT_ID = "3a1255e198e14137b9a5f30fc6ec30a5"
-SPOTIFY_CLIENT_SECRET = "e3036089552a4ea79ca5ccf8bac45f80"
-SPOTIFY_SCOPES: list[str] = []
-SPOTIFY_REDIRECT_URL = "http://localhost:8080/integrations/spotify/callback"
+class SpotifySettings(BaseModel):
+    client_id: str = "3a1255e198e14137b9a5f30fc6ec30a5"
+    client_secret: str = "e3036089552a4ea79ca5ccf8bac45f80"
+    scopes: list[str] = []
+    redirect_url: str = (
+        "http://localhost:8080/integrations/spotify" "/callback"
+    )
+
+
+class Settings(BaseSettings):
+    spotify_settings: SpotifySettings = SpotifySettings()
+
+
+@lru_cache
+def get_settings():
+    return Settings()

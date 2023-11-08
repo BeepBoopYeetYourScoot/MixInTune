@@ -10,6 +10,8 @@ python = "^3.10"
 async-spotify = "^0.4.4"
 black = "^23.10.1"
 uvicorn = "^0.24.0.post1"
+aioredis = "^2.0.1"
+pydantic-settings = "^2.0.3"
 
 
 [build-system]
