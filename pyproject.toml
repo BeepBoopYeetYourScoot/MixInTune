@@ -12,6 +12,7 @@ black = "^23.10.1"
 uvicorn = "^0.24.0.post1"
 aioredis = "^2.0.1"
 pydantic-settings = "^2.0.3"
+fastapi-sso = "^0.7.2"
 
 
 [build-system]
