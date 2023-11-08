@@ -1,40 +1,25 @@
-from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, APIRouter, Depends
+from fastapi import FastAPI, Depends
 
 from core.settings import Settings, get_settings
-from integrations.spotify.auth import spotify_router, spotify_client
+from core.utils.lifespan import lifespan
+from integrations.spotify.controllers import api_router
 
-
-def _on_startup():
-    pass
-
-
-def _on_shutdown():
-    spotify_client.close_client()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    _on_startup()
-    yield
-    _on_shutdown()
-
+settings = get_settings()
 
 app = FastAPI(lifespan=lifespan)
-main_router = APIRouter()
 
 
-@main_router.get("/")
+@app.get("/")
 async def homepage():
     return {"Hello": "World"}
 
 
-@main_router.get("info")
+@app.get("info")
 async def info(settings: Annotated[Settings, Depends(get_settings)]):
-    return {"spotify_redirect_url": settings.spotify_settings.redirect_url}
+    return {"spotify_redirect_url": settings.spotify.callback_url}
 
 
-app.include_router(spotify_router, tags=["Spotify API"])
+app.include_router(api_router, tags=["Spotify API"])
 # app.include_router(mixer_router, prefix="/v1", tags=["Mixer"])
