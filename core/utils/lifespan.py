@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from integrations.spotify.controllers import get_spotify_client
+from integrations.spotify.sso import get_spotify_sso
 
 
 async def _on_startup():
@@ -10,7 +11,7 @@ async def _on_startup():
 
 
 async def _on_shutdown():
-    await get_spotify_client().close_client()
+    await get_spotify_client(get_spotify_sso()).close_client()
 
 
 @asynccontextmanager

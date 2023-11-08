@@ -9,14 +9,13 @@ from fastapi import APIRouter, Depends
 from fastapi_sso.sso.spotify import SpotifySSO
 
 from core.settings import get_settings
-from integrations.spotify.sso import get_spotify_sso
 
 settings = get_settings()
 
 api_router = APIRouter(prefix="/integrations/spotify")
 
 
-def get_spotify_client(sso: SpotifySSO):
+def get_spotify_client(sso: SpotifySSO) -> SpotifyApiClient:
     auth_flow = AuthorizationCodeFlow(
         settings.spotify.client_id,
         settings.spotify.client_secret,
@@ -33,11 +32,14 @@ def get_spotify_client(sso: SpotifySSO):
     )
 
 
+# FIXME Need to make the OAuth work in a single click
+
+
 @api_router.get("/playlists")
 async def list_playlists(
-    sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
+    # sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
     spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
-    response_model=None,
+    # response_model=None,
 ):
     return await spotify_client.playlists.current_get_all()
 
@@ -45,9 +47,9 @@ async def list_playlists(
 @api_router.get("/playlists/{playlist_id}/tracks")
 async def list_playlist_tracks(
     playlist_id: str,
-    sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
+    # sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
     spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
-    response_model=None,
+    # response_model=None,
 ):
     return await spotify_client.playlists.get_tracks(playlist_id)
 
@@ -55,8 +57,8 @@ async def list_playlist_tracks(
 @api_router.get("/tracks/{tracks_id}/features")
 async def list_track_features(
     track_id: str,
-    sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
+    # sso: Annotated[SpotifySSO, Depends(get_spotify_sso)],
     spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
-    response_model=None,
+    # response_model=None,
 ):
     return await spotify_client.track.audio_analyze(track_id)
