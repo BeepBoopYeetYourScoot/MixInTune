@@ -11,13 +11,11 @@ class SpotifySettings(BaseModel):
     client_id: str = "3a1255e198e14137b9a5f30fc6ec30a5"
     client_secret: str = "e3036089552a4ea79ca5ccf8bac45f80"
     scopes: list[str] = []
-    redirect_url: str = (
-        "http://localhost:8080/integrations/spotify" "/callback"
-    )
+    callback_url: str = "http://localhost:8080/integrations/spotify/callback"
 
 
 class Settings(BaseSettings):
-    spotify_settings: SpotifySettings = SpotifySettings()
+    spotify: SpotifySettings = SpotifySettings()
 
 
 @lru_cache
