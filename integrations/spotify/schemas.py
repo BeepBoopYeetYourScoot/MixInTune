@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from pydantic import BaseModel
 
 
@@ -13,7 +11,6 @@ class SpotifyTrack(BaseModel):
 
     @staticmethod
     def parse_from_dict(track: dict) -> "SpotifyTrack":
-        pprint(track)
         return SpotifyTrack(
             id=track["id"],
             name=track["name"],

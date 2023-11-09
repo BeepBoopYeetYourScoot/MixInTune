@@ -82,15 +82,17 @@ def _extract_track_objects(tracks: dict):
     ]
 
 
-@api_router.get("/playlists/{playlist_id}/spread")
-async def get_playlist_tune_spread(
+@api_router.get("/playlists/{playlist_id}/features")
+async def list_playlist_track_features(
     playlist_id: str,
     spotify_client: SpotifyClient,
 ):
     tracks = _extract_track_objects(
         await spotify_client.playlists.get_tracks(playlist_id)
     )
-    return tracks
+    return await spotify_client.track.several_audio_features(
+        [track.id for track in tracks]
+    )
 
 
 @api_router.get("/tracks/{tracks_id}/features")
