@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends
 
 from core.connections import get_redis_connection
 from core.settings import get_settings
-from integrations.spotify.schemas import SpotifyTrack
+from integrations.spotify.schemas import SpotifyTrack, SpotifyTrackFeatures
 
 settings = get_settings()
 
@@ -82,6 +82,10 @@ def _extract_track_objects(tracks: dict):
     ]
 
 
+def _extract_track_features(features: dict):
+    return SpotifyTrackFeatures
+
+
 @api_router.get("/playlists/{playlist_id}/features")
 async def list_playlist_track_features(
     playlist_id: str,
@@ -95,9 +99,12 @@ async def list_playlist_track_features(
     )
 
 
-@api_router.get("/tracks/{tracks_id}/features")
+@api_router.get("/tracks/{track_id}/analysis")
 async def list_track_features(
     track_id: str,
     spotify_client: SpotifyClient,
 ):
+    """
+    Warning: Analysis may take some time
+    """
     return await spotify_client.track.audio_analyze(track_id)
