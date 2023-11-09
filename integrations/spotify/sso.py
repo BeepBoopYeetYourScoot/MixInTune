@@ -5,7 +5,7 @@ from aioredis import Redis
 from fastapi import APIRouter, Depends, Request
 from fastapi_sso.sso.spotify import SpotifySSO
 
-from core.connections import get_redis_connection
+from core.connections.redis import get_redis_connection
 from core.settings import get_settings
 
 settings = get_settings()

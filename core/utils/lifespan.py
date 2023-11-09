@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from core.connections import get_redis_connection
-from integrations.spotify.controllers import get_spotify_client
+from core.connections.redis import get_redis_connection
+from core.connections.spotify import get_spotify_client
 
 
 async def _on_startup():
