@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends
 
 from core.connections import get_redis_connection
 from core.settings import get_settings
+from integrations.spotify.schemas import SpotifyTrack
 
 settings = get_settings()
 
@@ -40,12 +41,13 @@ async def get_spotify_client(
         activation_time=60000,
     )
 
-    loguru.logger.info(
-        f"Creating client with \n"
+    loguru.logger.debug(
+        f"Creating Spotify client: \n"
         f"{auth_token.access_token=} \n "
-        f"{auth_token.refresh_token=}"
+        f"{auth_token.refresh_token=} \n"
+        f"{auth_token.activation_time=} \n"
     )
-    loguru.logger.info(f"{auth_token.valid=}")
+    loguru.logger.debug(f"{auth_token.valid=}")
 
     client = SpotifyApiClient(
         authorization_flow=auth_flow,
@@ -55,9 +57,13 @@ async def get_spotify_client(
     return client
 
 
+# That's how FastAPI dynamic annotations work
+SpotifyClient = Annotated[SpotifyApiClient, Depends(get_spotify_client)]
+
+
 @api_router.get("/playlists")
 async def list_playlists(
-    spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
+    spotify_client: SpotifyClient,
 ):
     return await spotify_client.playlists.current_get_all()
 
@@ -65,14 +71,31 @@ async def list_playlists(
 @api_router.get("/playlists/{playlist_id}/tracks")
 async def list_playlist_tracks(
     playlist_id: str,
-    spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
+    spotify_client: SpotifyClient,
 ):
     return await spotify_client.playlists.get_tracks(playlist_id)
+
+
+def _extract_track_objects(tracks: dict):
+    return [
+        SpotifyTrack.parse_from_dict(item["track"]) for item in tracks["items"]
+    ]
+
+
+@api_router.get("/playlists/{playlist_id}/spread")
+async def get_playlist_tune_spread(
+    playlist_id: str,
+    spotify_client: SpotifyClient,
+):
+    tracks = _extract_track_objects(
+        await spotify_client.playlists.get_tracks(playlist_id)
+    )
+    return tracks
 
 
 @api_router.get("/tracks/{tracks_id}/features")
 async def list_track_features(
     track_id: str,
-    spotify_client: Annotated[SpotifyApiClient, Depends(get_spotify_client)],
+    spotify_client: SpotifyClient,
 ):
     return await spotify_client.track.audio_analyze(track_id)
